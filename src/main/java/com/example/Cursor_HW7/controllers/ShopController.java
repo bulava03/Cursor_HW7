@@ -6,7 +6,9 @@ import com.example.Cursor_HW7.services.ShopService;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/shops")
@@ -41,5 +43,10 @@ public class ShopController {
     @PutMapping("/{id}")
     public Shop updateShop(@PathVariable Long id, @RequestBody Shop shop) {
         return shopService.updateShop(id, shop);
+    }
+
+    @ExceptionHandler(ResponseStatusException.class)
+    public ResponseEntity<String> handleResponseStatusException(ResponseStatusException ex) {
+        return ResponseEntity.status(ex.getStatusCode()).body(ex.getReason());
     }
 }

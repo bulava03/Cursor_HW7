@@ -20,7 +20,11 @@ public class ShopService {
     }
 
     public void deleteShop(Long id) {
-        shops.removeIf(shop -> shop.getId().equals(id));
+        boolean isRemoved = shops.removeIf(shop -> shop.getId().equals(id));
+
+        if (!isRemoved) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Магазин з ідентифікатором " + id + " не знайдено");
+        }
     }
 
     public List<Shop> getAllShops() {
@@ -31,11 +35,15 @@ public class ShopService {
         return shops.stream()
                 .filter(shop -> shop.getId().equals(id))
                 .findFirst()
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Shop not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Магазин з ідентифікатором " + id + " не знайдено"));
     }
 
     public Shop updateShop(Long id, Shop shop) {
-        Shop existingShop = getShopById(id);
+        Shop existingShop = shops.stream()
+                .filter(s -> s.getId().equals(id))
+                .findFirst()
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Магазин з ідентифікатором " + id + " не знайдено"));
+
         existingShop.setCity(shop.getCity());
         existingShop.setStreet(shop.getStreet());
         existingShop.setName(shop.getName());
